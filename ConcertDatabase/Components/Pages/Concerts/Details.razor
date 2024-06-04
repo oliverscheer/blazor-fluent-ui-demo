@@ -1,0 +1,52 @@
+﻿@page "/concert/{ItemID:guid}"
+@using ConcertDatabase.Components.Pages.Artists.Panels
+@using ConcertDatabase.Components.Pages.Concerts.Panels
+@using ConcertDatabase.Entities
+@using ConcertDatabase.Repositories
+@inject IDialogService dialogService
+@inject ConcertRepository repository
+@inject NavigationManager navigationManager
+
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+
+<h3>Concert Details</h3>
+
+@if (concert != null)
+{
+    <FluentButton IconStart="@(new Icons.Regular.Size16.People())" OnClick="@(() => navigationManager.NavigateTo($"artist/{concert.Artist.ID}"))">@concert.Artist.Name</FluentButton>
+    
+    <FluentLabel>Artist: @concert.Artist.Name</FluentLabel>
+    <FluentLabel>Tour Name: @concert.Name</FluentLabel>
+    <FluentLabel>Description: @concert.Description</FluentLabel>
+    <FluentLabel>Date: @concert.Date</FluentLabel>
+    <FluentLabel>Venue: @concert.Venue</FluentLabel>
+    <FluentLabel>City: @concert.City</FluentLabel>
+}
+else
+{
+    <p><em>Loading...</em></p>
+}
+
+@code {
+    [Parameter]
+    public Guid ItemId { get; set; }
+
+    Concert? concert;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        concert = await repository.GetByIdWithArtist(ItemId);
+    }
+
+    private void ShowItem(Concert item)
+    {
+        navigationManager.NavigateTo($"/artist/{item.ID}");
+    }
+}

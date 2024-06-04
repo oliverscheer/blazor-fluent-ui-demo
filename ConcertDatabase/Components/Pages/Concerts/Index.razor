@@ -1,0 +1,195 @@
+﻿@page "/concerts"
+@using ConcertDatabase.Components.Pages.Concerts.Panels
+@using ConcertDatabase.Entities
+@using ConcertDatabase.Repositories
+@inject ConcertRepository repository
+@inject IDialogService dialogService
+@rendermode InteractiveServer
+@inject NavigationManager navigationManager
+
+<h3>Concert List</h3>
+
+<FluentButton IconStart="@(new Icons.Regular.Size16.Add())" OnClick="@(() => AddConcertInDialog())">Add Concert</FluentButton>
+
+@if (concerts != null)
+{
+    <FluentDataGrid Items="@concerts" TGridItem="Concert" Pagination="@pagination">
+        <TemplateColumn Title="Date" Sortable="true">
+            <FluentLabel>@context.Artist.Name</FluentLabel>
+        </TemplateColumn>
+        <PropertyColumn Property="@(c => c.Venue)" Sortable="true" />
+        <TemplateColumn Title="Date" Sortable="true">
+            <FluentLabel>@context.Date?.ToShortDateString()</FluentLabel>
+        </TemplateColumn>
+        <PropertyColumn Property="@(c => c.City)" Sortable="true" />
+        <TemplateColumn Title="Actions">
+            <FluentButton IconStart="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => EditInDialog(context))" />
+            <FluentButton IconStart="@(new Icons.Regular.Size16.DesktopEdit())" OnClick="@(() => EditInPanel(context))" />
+            <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => DeleteConcert(context))" />
+            <FluentButton IconStart="@(new Icons.Regular.Size16.Glasses())" OnClick="@(() => ShowConcert(context))" />
+        </TemplateColumn>
+    </FluentDataGrid>
+
+    <FluentPaginator State="@pagination" />
+}
+else
+{
+    <p><em>Loading...</em></p>
+}
+
+@code {
+
+    IQueryable<Concert>? concerts;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 15 };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        concerts = await repository.GetAllWithArtists();
+    }
+
+    #region Data Methods
+
+    #region Add
+
+    private async Task AddConcertInDialog()
+    {
+        Concert newConcert = new();
+
+        var parameters = new DialogParameters
+            {
+                Title = "Add Concert",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true
+            };
+
+        var dialog = await dialogService.ShowDialogAsync<EditConcertPanel>(newConcert, parameters);
+        var dialogResult = await dialog.Result;
+        await HandleAddDialogResult(dialogResult);
+    }
+
+    private async Task HandleAddDialogResult(DialogResult result)
+    {
+        if (result.Cancelled)
+        {
+            return;
+        }
+
+        if (result.Data is not null)
+        {
+            var newConcert = result.Data as Concert;
+            if (newConcert is null)
+            {
+                return;
+            }
+
+            await repository.AddAsync(newConcert);
+            await LoadData();
+        }
+    }
+
+    #endregion 
+
+    #region Edit
+
+    private async Task EditInDialog(Concert concert)
+    {
+        var parameters = new DialogParameters
+            {
+                Title = "Edit Concert",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true
+            };
+
+        var dialog = await dialogService.ShowDialogAsync<EditConcertPanel>(concert.DeepCopy(), parameters);
+        var dialogResult = await dialog.Result;
+        HandleEditConcertDialogResult(dialogResult, concert);
+    }
+
+    private async Task EditInPanel(Concert originalConcert)
+    {
+        DialogParameters<Concert> parameters = new()
+            {
+                Title = $"Edit Concert",
+                Alignment = HorizontalAlignment.Right,
+                PrimaryAction = "Ok",
+                SecondaryAction = "Cancel"
+            };
+        Concert editConcert = originalConcert.DeepCopy();
+        var dialog = await dialogService.ShowPanelAsync<EditConcertPanel>(editConcert, parameters);
+        var dialogResult = await dialog.Result;
+        HandleEditConcertDialogResult(dialogResult, originalConcert);
+    }
+
+    private void HandleEditConcertDialogResult(DialogResult result, Concert originalConcert)
+    {
+        if (result.Cancelled)
+        {
+            return;
+        }
+
+        if (result.Data is not null)
+        {
+            var updatedConcert = result.Data as Concert;
+            if (updatedConcert is null)
+            {
+                return;
+            }
+
+            originalConcert.Artist = updatedConcert.Artist;
+            originalConcert.City = updatedConcert.City;
+            originalConcert.Date = updatedConcert.Date;
+            originalConcert.Description = updatedConcert.Description;
+            originalConcert.Venue = updatedConcert.Venue;
+
+            return;
+        }
+    }
+
+    #endregion
+
+    #region Delete
+    
+    private async Task DeleteConcert(Concert item)
+    {
+        if (item is null)
+        {
+            return;
+        }
+
+        var dialogParameters = new DialogParameters
+        {
+            Title = "Delete Concert",
+            PreventDismissOnOverlayClick = true,
+            PreventScroll = true
+        };
+
+        // var dialog = await dialogService.ShowDialogAsync<ConfirmationPanel>(dialogParameters);
+        var dialog = await dialogService.ShowConfirmationAsync(
+            "Are you sure you want to delete this concert?", 
+            "Yes", 
+            "No", 
+            "Delete Concert?");
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            await repository.DeleteAsync(item);
+            await repository.SaveAsync();
+            await LoadData();
+        }
+    }
+
+    #endregion
+
+
+    private void ShowConcert(Concert item)
+    {
+        navigationManager.NavigateTo($"/concert/{item.ID}");
+    }
+
+    #endregion
+}

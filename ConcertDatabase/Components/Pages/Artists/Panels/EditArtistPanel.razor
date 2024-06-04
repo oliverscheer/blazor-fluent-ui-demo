@@ -1,0 +1,38 @@
+﻿@using ConcertDatabase.Entities
+@implements IDialogContentComponent<Artist>
+
+<FluentDialogHeader ShowDismiss="false">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.Delete())" />
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+<FluentTextField Label="Name" @bind-Value="@Content.Name" />
+<FluentTextField Label="Description" @bind-Value="@Content.Description" />
+
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Save())" OnClick="@SaveAsync">Speichern</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Abbrechen</FluentButton>
+</FluentDialogFooter>
+
+@code {
+
+    [Parameter]
+    public Artist Content { get; set; } = default!;
+
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+
+    private async Task SaveAsync()
+    {
+        await Dialog.CloseAsync(Content);
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog.CancelAsync();
+    }
+}
