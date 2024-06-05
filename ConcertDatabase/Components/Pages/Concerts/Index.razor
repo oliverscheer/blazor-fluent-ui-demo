@@ -7,7 +7,7 @@
 @rendermode InteractiveServer
 @inject NavigationManager navigationManager
 
-<h3>Concert List</h3>
+<h3>Concerts</h3>
 
 <FluentButton IconStart="@(new Icons.Regular.Size16.Add())" OnClick="@(() => AddConcertInDialog())">Add Concert</FluentButton>
 
@@ -42,14 +42,14 @@ else
     IQueryable<Concert>? concerts;
     PaginationState pagination = new PaginationState { ItemsPerPage = 15 };
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await LoadData();
+        LoadData();
     }
 
-    private async Task LoadData()
+    private void LoadData()
     {
-        concerts = await repository.GetAllWithArtists();
+        concerts = repository.GetAllWithArtists();
     }
 
     #region Data Methods
@@ -88,7 +88,7 @@ else
             }
 
             await repository.AddAsync(newConcert);
-            await LoadData();
+            LoadData();
         }
     }
 
@@ -177,9 +177,9 @@ else
         var result = await dialog.Result;
         if (!result.Cancelled)
         {
-            await repository.DeleteAsync(item);
+            repository.Delete(item);
             await repository.SaveAsync();
-            await LoadData();
+            LoadData();
         }
     }
 

@@ -19,7 +19,7 @@ namespace ConcertDatabase.Repositories
             return result;
         }
 
-        public async Task<IQueryable<Concert>?> GetAllWithArtists()
+        public IQueryable<Concert>? GetAllWithArtists()
         {
             var result = Entities
                 .Include(c => c.Artist)

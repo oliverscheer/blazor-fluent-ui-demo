@@ -8,11 +8,12 @@ namespace ConcertDatabase.Entities
         public string? Venue { get; set; }
         public DateTime? Date { get; set; }
         public string? City { get; set; }
+        public string? Url { get; set; }
+        public string? SetList { get; set; }
 
         [JsonIgnore]
         [ForeignKey("ArtistID")]
         public virtual Artist Artist { get; set; } = default!;
         public Guid ArtistID { get; set; }
-
     }
 }

@@ -14,7 +14,6 @@
 
 @if (artists != null)
 {
-
     <FluentDataGrid Items="@artists" TGridItem="Artist" Pagination="@pagination">
         <PropertyColumn Property="@(c => c.Name)" Sortable="true" />
         <PropertyColumn Property="@(c => c.Description)" Sortable="true" />
@@ -45,7 +44,7 @@ else
 
     private void LoadData()
     {
-        artists = repository.Entities;
+        artists = repository.Entities.ToList().AsQueryable();
     }
 
     #region Data Methods
@@ -54,6 +53,7 @@ else
 
     private async Task AddInDialog()
     {
+        // Create new empty object
         Artist newItem = new();
 
         var parameters = new DialogParameters
@@ -62,7 +62,7 @@ else
                 PreventDismissOnOverlayClick = true,
                 PreventScroll = true
             };
-
+        // show dialog
         var dialog = await dialogService.ShowDialogAsync<EditArtistPanel>(newItem, parameters);
         var dialogResult = await dialog.Result;
         await HandleAddDialogResult(dialogResult);
@@ -92,6 +92,7 @@ else
 
     #region Edit
 
+    // Open the dialog for the item
     private async Task EditInDialog(Artist originalItem)
     {
         var parameters = new DialogParameters
@@ -106,6 +107,7 @@ else
         await HandleEditConcertDialogResult(dialogResult, originalItem);
     }
 
+    // Open the panel for the item
     private async Task EditInPanel(Artist originalItem)
     {
         DialogParameters<Artist> parameters = new()
@@ -120,21 +122,25 @@ else
         await HandleEditConcertDialogResult(dialogResult, originalItem);
     }
 
+    // Handle the result of the edit dialog/panel
     private async Task HandleEditConcertDialogResult(DialogResult result, Artist originalItem)
     {
+        // If cancelled, return
         if (result.Cancelled)
         {
             return;
         }
 
+        // If the data is not null, update the item
         if (result.Data is not null)
         {
-            var updatedItem= result.Data as Artist;
+            var updatedItem = result.Data as Artist;
             if (updatedItem is null)
             {
                 return;
             }
 
+            // Take the data from the "edited" item and put it into the original item
             originalItem.Name = updatedItem.Name;
             originalItem.Description = updatedItem.Description;
 
@@ -150,32 +156,30 @@ else
 
     private async Task DeleteItem(Artist item)
     {
+        // Check if the item is null
         if (item is null)
         {
             return;
         }
 
-        var dialogParameters = new DialogParameters
-        {
-            Title = "Delete Artist",
-            PreventDismissOnOverlayClick = true,
-            PreventScroll = true
-        };
-
-        var dialog = await dialogService.ShowConfirmationAsync(
-            "Are you sure you want to delete this artist?", 
+        // Create and show a dialog to confirm the delete
+        IDialogReference dialog = await dialogService.ShowConfirmationAsync(
+            $"Are you sure you want to delete the artist '{item.Name}'?",
             "Yes", 
             "No", 
-            "Delete Concert?");
-        var result = await dialog.Result;
+            "Delete Artist?");
+        DialogResult result = await dialog.Result;
+
+        // If cancelled, return
         if (result.Cancelled)
         {
             return;
         }
 
+        // Delete the item
         try
         {
-            await repository.DeleteAsync(item);
+            repository.Delete(item);
             await repository.SaveAsync();
             LoadData();
         }
@@ -184,7 +188,6 @@ else
             string errorMessage = exc.InnerException?.Message ?? exc.Message;
             await dialogService.ShowErrorAsync("Error", errorMessage);
         }
-
     }
 
     #endregion

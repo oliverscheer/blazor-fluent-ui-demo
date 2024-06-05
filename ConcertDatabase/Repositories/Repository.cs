@@ -9,7 +9,7 @@ namespace ConcertDatabase.Repositories
         : IRepository<TEntity> where TEntity : Entity
     {
         internal readonly MusicDbContext _context = myDbContextFactory.CreateDbContext();
-        protected DbSet<TEntity> _entities;
+        protected DbSet<TEntity>? _entities;
         public DbSet<TEntity> Entities
         {
             get
@@ -32,10 +32,10 @@ namespace ConcertDatabase.Repositories
             {
                 return false;
             }
-            return await DeleteAsync(entity);
+            return Delete(entity);
         }
 
-        public async Task<bool> DeleteAsync(TEntity entity)
+        public bool Delete(TEntity entity)
         {
             Entities.Remove(entity);
             return true;
@@ -70,7 +70,11 @@ namespace ConcertDatabase.Repositories
 
         public Task UpdateAsync(object Id, TEntity entity)
         {
-            TEntity exist = Entities.Find(Id);
+            TEntity? exist = Entities.Find(Id);
+            if (exist == null)
+            {
+                return Task.CompletedTask;
+            }
             _context.Entry(exist).CurrentValues.SetValues(entity);
             return Task.CompletedTask;
         }

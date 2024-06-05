@@ -10,15 +10,17 @@
     </FluentStack>
 </FluentDialogHeader>
 
+<FluentDatePicker Label="Date" @bind-Value="@Content.Date" />
 <FluentTextField Label="Name" @bind-Value="@Content.Name" />
 <FluentTextField Label="Venue" @bind-Value="@Content.Venue" />
 <FluentTextField Label="City" @bind-Value="@Content.City" />
-<FluentTextField Label="Description" @bind-Value="@Content.Description" />
-<FluentDatePicker Label="Date" @bind-Value="@Content.Date" />
+<FluentTextArea Label="Setlist" @bind-Value="@Content.SetList" />
+<FluentTextArea Label="Description" @bind-Value="@Content.Description" />
+<FluentTextArea Label="Url" @bind-Value="@Content.Url" />
 
 <FluentDialogFooter>
-    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Save())" OnClick="@SaveAsync">Speichern</FluentButton>
-    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Abbrechen</FluentButton>
+    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Save())" OnClick="@SaveAsync">Save</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
 </FluentDialogFooter>
 
 @code {

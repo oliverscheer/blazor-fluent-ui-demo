@@ -19,11 +19,11 @@ namespace ConcertDatabase.Repositories
             return result;
         }
 
-        public async Task AddConcertAsync(Artist artist, Concert concert)
+        public void AddConcert(Artist artist, Concert concert)
         {
             _logger.LogInformation("Add concert to artist");
 
-            if (artist == null || 
+            if (artist == null ||
                 concert == null)
             {
                 _logger.LogWarning("- Artist or concert is null");

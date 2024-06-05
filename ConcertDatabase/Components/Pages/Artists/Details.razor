@@ -24,7 +24,9 @@
     {
         <FluentDataGrid Items="@concerts" TGridItem="Concert">
             <PropertyColumn Property="@(c => c.Name)" Sortable="true" />
-            <PropertyColumn Property="@(c => c.Date)" Sortable="true" />
+            <TemplateColumn Title="Date" Sortable="true">
+                <FluentLabel>@context.Date?.ToShortDateString()</FluentLabel>
+            </TemplateColumn>
             <PropertyColumn Property="@(c => c.Venue)" Sortable="true" />
             <PropertyColumn Property="@(c => c.City)" Sortable="true" />
             <TemplateColumn Title="Actions">
@@ -69,7 +71,7 @@ else
 
         var dialogParameters = new DialogParameters
             {
-                Title = "Delete Concert",
+                Title = "Delete Artist",
                 PreventDismissOnOverlayClick = true,
                 PreventScroll = true
             };
@@ -82,9 +84,8 @@ else
         var result = await dialog.Result;
         if (!result.Cancelled)
         {
-            await repository.DeleteAsync(artist);
+            repository.Delete(artist);
             await repository.SaveAsync();
-            // await LoadData();
             navigationManager.NavigateTo("/artists");
         }
     }
@@ -127,7 +128,7 @@ else
                 return;
             }
 
-            await repository.AddConcertAsync(artist, concert);
+            repository.AddConcert(artist, concert);
             await LoadData();
         }
     }
@@ -154,7 +155,7 @@ else
     {
         DialogParameters<Concert> parameters = new()
             {
-                Title = $"Edit Artist",
+                Title = $"Edit Concert",
                 Alignment = HorizontalAlignment.Right,
                 PrimaryAction = "Ok",
                 SecondaryAction = "Cancel"
@@ -183,6 +184,9 @@ else
             originalItem.Description = concert.Description;
             originalItem.Date = concert.Date;
             originalItem.Venue = concert.Venue;
+            originalItem.City = concert.City;
+            originalItem.SetList = concert.SetList;
+            originalItem.Url = concert.Url;
 
             repository.UpdateConcert(originalItem);
             await repository.SaveAsync();
