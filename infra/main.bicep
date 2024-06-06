@@ -16,7 +16,7 @@ var tags = {
 }
 
 // App Service Plan
-var aspName = 'asp-oliverssampleapps'
+var aspName = 'asp-olivers-sample-apps'
 module appServicePlan 'modules/app-service-plan-linux.bicep' = {
   name: 'deploy-${aspName}'
   params: {
@@ -36,7 +36,7 @@ var connectionStrings = [
 ]
 
 // Web App
-var webAppName = 'app-${appName}'
+var webAppName = appName
 module appCopilot 'modules/web-app-linux.bicep' = {
   name: 'deploy-${webAppName}'
   params: {
@@ -56,8 +56,8 @@ module appCopilot 'modules/web-app-linux.bicep' = {
 }
 
 // SQL Database
-var sqlServerName = 'sqlserver${appName}'
-var sqlDbName = appName
+var sqlServerName = 'sql-server-olivers'
+var sqlDbName = 'sql-db-${appName}'
 
 module sqlDatabase 'modules/sql-database-serverless.bicep' = {
   name: 'deploy-${appName}-sql'
