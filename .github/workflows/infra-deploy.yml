@@ -1,0 +1,49 @@
+name: Deploy Infrastructure to Azure
+
+run-name: '"${{ github.actor }}" is deploying infrastructure'
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'infra/**'
+    branches:
+      - main
+  
+env: 
+  LOCATION: northeurope
+  DEPLOYMENT_NAME: copilot-infra-deployment
+  TEMPLATE_FILE: infra/main.bicep
+  APP_NAME: 'oliverscopilot'
+  
+jobs:
+  
+  build:
+    name: Deploy Infrastructure and App
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      # Build Infrastructure
+      - name: Build and Deploy Bicep
+        id: buildinfrastructure
+        uses: ./.github/actions/build-infrastructure
+        with:
+          location: ${{ env.LOCATION }}
+          deploymentName: ${{ env.DEPLOYMENT_NAME }}
+          bicepFile: ${{ env.TEMPLATE_FILE }}
+          azureCredentials: ${{ secrets.AZURE_CREDENTIALS }}
+          appName: ${{ env.APP_NAME }}
+      
+      # Build App and Deploy
+      - name: Build and Deploy WebApp
+        uses: ./.github/actions/azure-web-app-deploy
+        with:
+          pathToProject: './src/DataWebApp'
+          # appName: ${{ steps.buildinfrastructure.outputs.appName }}
+          appName: ${{ env.APP_NAME }}
+          dotnetVersion: '8.0.x'
+          azureCredentials: ${{ secrets.AZURE_CREDENTIALS }}
+  

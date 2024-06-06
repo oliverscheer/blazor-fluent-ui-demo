@@ -1,0 +1,36 @@
+name: Build and Deploy to Azure
+
+run-name: 'User "${{ github.actor }}" is deploying a web app to "${{ github.event.inputs.appServiceName }}"'
+
+on: 
+  workflow_dispatch:
+    inputs:
+      appServiceName:
+        description: 'The name of the Azure App Service'
+        default: 'oliversconcertdatabase'
+        required: true
+
+      dotnetVersion:
+        description: 'The version of .NET to use'
+        required: true
+        default: '8.0.x'
+
+  
+jobs:
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build and Deploy WebApp
+      uses: ./.github/actions/azure-web-app-deploy
+      with:
+        pathToProject: './src/Oliver.AI.Clients.RazorApp'
+        appName: ${{ github.event.inputs.appServiceName }}
+        dotnetVersion: ${{ github.event.inputs.dotnetVersion }}
+        azureCredentials: ${{ secrets.AZURE_CREDENTIALS }}
+

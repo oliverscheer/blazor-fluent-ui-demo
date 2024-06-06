@@ -1,0 +1,102 @@
+name: 'Build Infrastructure'
+description: ''
+inputs:
+  appName:
+    description: 'The name of the Azure App Service'
+    default: 'oliversconcertdatabase'
+    required: true
+
+  bicepFile:
+    description: 'The path to the Bicep file'
+    default: 'infra/main.bicep'
+    required: true
+
+  deploymentName:
+    description: 'Deployment name'
+    default: 'oliversconcertdatabase'
+    required: true
+
+  location:
+    description: 'The location of the deployment'
+    default: 'northeurope'
+    required: true
+
+outputs:
+  appName:
+    description: 'The URL of the deployed web app'
+    value: ${{ steps.bicepdeploy.outputs.appName }}
+
+runs:
+  using: 'composite'  
+  
+  steps:
+  
+    - name: Build bicep files
+      id: build
+      uses: azure/powershell@v1.4.0
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          md output-bicep
+          az bicep build --file ${{ inputs.bicepFile }} --outdir output-bicep
+            
+          if ( $? -eq $false ) 
+          {
+            Write-Host "Deployment failed"
+            exit 1
+          }
+  
+    - name: Azure Login
+      uses: Azure/login@v2.0.0
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        enable-AzPSSession: true
+
+    - name: Azure CLI script
+      uses: azure/cli@v2
+      with:
+        azcliversion: latest
+        inlineScript: |
+          az account show
+
+    - name: Deploy Bicep to Azure
+      id: deploy
+      uses: azure/powershell@v1.4.0
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          $deploymentResult = az deployment group create `
+            --template-file output-bicep/main.json `
+            --name ${{ inputs.deploymentName }} `
+            --location=${{ inputs.location }} `
+            --parameters `
+              appName=${{ inputs.appName }} `
+              sqlAdministratorName=${{ secrets.SQL_ADMINISTRATOR_NAME }} `
+              sqlAdministratorPassword=${{ secrets.SQL_ADMINISTRATOR_PASSWORD }} `
+              location=${{ inputs.location }} `
+            | ConvertFrom-Json
+
+          if ($? -eq $false) {
+            Write-Host "Deployment failed"
+            exit 1
+          }
+
+          echo "outputs: $deploymentResult.properties.outputs"
+          echo "outputs: $deploymentResult.properties.outputs" >> $GITHUB_STEP_SUMMARY
+          echo "appName=$deploymentResult.properties.outputs.appName.value" >> $GITHUB_STEP_SUMMARY
+          echo "appName=$deploymentResult.properties.outputs.appName.value" >> $GITHUB_OUTPUT
+          echo "deploymentResult=result=$deploymentResult" >> $GITHUB_OUTPUT
+
+          # echo $deploymentResult >> $env:GITHUB_STEP_SUMMARY
+          # echo $appName >> $env:GITHUB_STEP_SUMMARY
+
+    - name: Some Output
+      shell: bash
+      run: |
+        echo ":rocket: Deployment Result" >> $GITHUB_STEP_SUMMARY
+        echo "| Key      | Description     |" >> $GITHUB_STEP_SUMMARY
+        echo "| -------- | --------------- |" >> $GITHUB_STEP_SUMMARY
+        echo "| App Name | $(steps.deploy.outputs.appName) |" >> $GITHUB_STEP_SUMMARY
+
+
+          

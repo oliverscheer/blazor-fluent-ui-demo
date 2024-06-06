@@ -32,7 +32,7 @@ services.AddFluentUIComponents();
 services.AddDataGridEntityFrameworkAdapter();
 
 services.AddDbContextFactory<MusicDbContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("MusicContext"))
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("MusicDbContext"))
     );
 
 services.AddTransient<ArtistRepository>();
