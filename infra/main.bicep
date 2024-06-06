@@ -16,7 +16,7 @@ var tags = {
 }
 
 // App Service Plan
-var aspName = 'asp-${appName}'
+var aspName = 'asp-oliverssampleapps'
 module appServicePlan 'modules/app-service-plan-linux.bicep' = {
   name: 'deploy-${aspName}'
   params: {
