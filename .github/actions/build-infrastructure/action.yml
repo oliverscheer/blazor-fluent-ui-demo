@@ -61,7 +61,7 @@ runs:
     - name: Azure Login
       uses: Azure/login@v2.0.0
       with:
-        creds: ${{ inputs.AZURE_CREDENTIALS }}
+        creds: ${{ inputs.azureCredentials }}
 
     - name: Azure CLI script
       uses: azure/cli@v2
