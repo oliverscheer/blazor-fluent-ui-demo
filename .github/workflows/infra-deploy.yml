@@ -14,7 +14,7 @@ env:
   LOCATION: northeurope
   DEPLOYMENT_NAME: copilot-infra-deployment
   TEMPLATE_FILE: infra/main.bicep
-  APP_NAME: 'app-olivers-concert-database'
+  APP_NAME: 'oliversconcertdatabase'
   
 jobs:
   
