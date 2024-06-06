@@ -5,7 +5,7 @@ description: 'Deploy an ASP.NET Web App to Azure App'
 inputs:
   appName:
     description: 'The name of the Azure App Service'
-    default: 'oliverscopilot'
+    default: 'app-olivers-concert-database'
     required: true
   pathToProject:
     description: 'Path to the ASP.NET Web App project'

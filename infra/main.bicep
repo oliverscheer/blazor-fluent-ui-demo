@@ -36,11 +36,11 @@ var connectionStrings = [
 ]
 
 // Web App
-var appCopilotName = 'app-${appName}'
+var webAppName = 'app-${appName}'
 module appCopilot 'modules/web-app-linux.bicep' = {
-  name: 'deploy-${appCopilotName}'
+  name: 'deploy-${webAppName}'
   params: {
-    name: appName
+    name: webAppName
     location: location
     tags: tags
     appServicePlanId: appServicePlan.outputs.id

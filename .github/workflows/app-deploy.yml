@@ -29,7 +29,7 @@ jobs:
     - name: Build and Deploy WebApp
       uses: ./.github/actions/azure-web-app-deploy
       with:
-        pathToProject: './src/Oliver.AI.Clients.RazorApp'
+        pathToProject: './ConcertDatabase'
         appName: ${{ github.event.inputs.appServiceName }}
         dotnetVersion: ${{ github.event.inputs.dotnetVersion }}
         azureCredentials: ${{ secrets.AZURE_CREDENTIALS }}
