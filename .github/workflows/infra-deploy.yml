@@ -44,7 +44,7 @@ jobs:
       - name: Build and Deploy WebApp
         uses: ./.github/actions/azure-web-app-deploy
         with:
-          pathToProject: './src/DataWebApp'
+          pathToProject: './ConcertDatabase'
           # appName: ${{ steps.buildinfrastructure.outputs.appName }}
           appName: ${{ env.APP_NAME }}
           dotnetVersion: '8.0.x'
