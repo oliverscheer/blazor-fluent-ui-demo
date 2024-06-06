@@ -63,7 +63,7 @@ runs:
     - name: Azure Login
       uses: Azure/login@v2.0.0
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        creds: ${{ inputs.AZURE_CREDENTIALS }}
         enable-AzPSSession: true
 
     - name: Azure CLI script
