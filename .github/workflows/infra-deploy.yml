@@ -35,6 +35,8 @@ jobs:
           deploymentName: ${{ env.DEPLOYMENT_NAME }}
           bicepFile: ${{ env.TEMPLATE_FILE }}
           azureCredentials: ${{ secrets.AZURE_CREDENTIALS }}
+          sqlAdministratorName: ${{ secrets.SQL_ADMINISTRATOR_NAME }}
+          sqlAdministratorPassword: ${{ secrets.SQL_ADMINISTRATOR_PASSWORD }}
           appName: ${{ env.APP_NAME }}
       
       # Build App and Deploy

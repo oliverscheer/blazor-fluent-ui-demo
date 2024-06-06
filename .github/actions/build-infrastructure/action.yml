@@ -11,6 +11,20 @@ inputs:
     default: 'infra/main.bicep'
     required: true
 
+  azureCredentials:
+    description: 'Azure credentials'
+    required: true
+
+  sqlAdministratorName:
+    description: 'The name of the SQL Server administrator'
+    default: 'oliver'
+    required: true
+
+  sqlAdministratorPassword: 
+    description: 'The password for the SQL Server administrator'
+    default: 'P@ssw0rd1234'
+    required: true
+
   deploymentName:
     description: 'Deployment name'
     default: 'oliversconcertdatabase'
@@ -71,8 +85,8 @@ runs:
             --location=${{ inputs.location }} `
             --parameters `
               appName=${{ inputs.appName }} `
-              sqlAdministratorName=${{ secrets.SQL_ADMINISTRATOR_NAME }} `
-              sqlAdministratorPassword=${{ secrets.SQL_ADMINISTRATOR_PASSWORD }} `
+              sqlAdministratorName=${{ inputs.sqlAdministratorNAme }} `
+              sqlAdministratorPassword=${{ inputs.sqlAdministratorPassword }} `
               location=${{ inputs.location }} `
             | ConvertFrom-Json
 
