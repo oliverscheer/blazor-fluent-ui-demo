@@ -84,8 +84,8 @@ runs:
             --resource-group ${{ inputs.resourceGroupName }} `
             --template-file output-bicep/main.json `
             --name ${{ inputs.deploymentName }} `
-            --location=${{ inputs.location }} `
             --parameters `
+              location=${{ inputs.location }} `
               appName=${{ inputs.appName }} `
               sqlAdministratorName=${{ inputs.sqlAdministratorName }} `
               sqlAdministratorPassword=${{ inputs.sqlAdministratorPassword }} `
