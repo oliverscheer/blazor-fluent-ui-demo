@@ -34,6 +34,7 @@ jobs:
           location: ${{ env.LOCATION }}
           deploymentName: ${{ env.DEPLOYMENT_NAME }}
           bicepFile: ${{ env.TEMPLATE_FILE }}
+          resourceGroupName: ${{ secrets.RESOURCE_GROUP_NAME }}
           azureCredentials: ${{ secrets.AZURE_CREDENTIALS }}
           sqlAdministratorName: ${{ secrets.SQL_ADMINISTRATOR_NAME }}
           sqlAdministratorPassword: ${{ secrets.SQL_ADMINISTRATOR_PASSWORD }}

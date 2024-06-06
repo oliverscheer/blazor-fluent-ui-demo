@@ -15,6 +15,10 @@ inputs:
     description: 'Azure credentials'
     required: true
 
+  resourceGroupName:
+    description: 'The name of the resource group'
+    required: true
+
   sqlAdministratorName:
     description: 'The name of the SQL Server administrator'
     required: true
@@ -77,12 +81,13 @@ runs:
         azPSVersion: "latest"
         inlineScript: |
           $deploymentResult = az deployment group create `
+            --resource-group ${{ inputs.resourceGroupName }} `
             --template-file output-bicep/main.json `
             --name ${{ inputs.deploymentName }} `
             --location=${{ inputs.location }} `
             --parameters `
               appName=${{ inputs.appName }} `
-              sqlAdministratorName=${{ inputs.sqlAdministratorNAme }} `
+              sqlAdministratorName=${{ inputs.sqlAdministratorName }} `
               sqlAdministratorPassword=${{ inputs.sqlAdministratorPassword }} `
               location=${{ inputs.location }} `
             | ConvertFrom-Json
